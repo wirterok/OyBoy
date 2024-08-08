@@ -51,11 +51,17 @@ class ViewInline(admin.TabularInline):
 class FavouriteInline(admin.TabularInline):
     model = Favourite
 
+class LikeInline(admin.TabularInline):
+    model = Like
+
+
+class DislikeInline(admin.TabularInline):
+    model = Dislike
 
 @admin.register(Video)
 class VideoAdmin(admin.ModelAdmin):
     # inlines = [LikeInline, DislikeInline, ViewInline]
-    inlines = [TagInline]
+    inlines = [TagInline, LikeInline, DislikeInline]
     list_display = ["name", "reports_count"]
     
     def get_queryset(self, request):
@@ -106,15 +112,15 @@ class ChannelReportAdmin(admin.ModelAdmin):
 #     pass
 
 
-# class CommentLikeInline(admin.TabularInline):
-#     model = CommentLike
+class CommentLikeInline(admin.TabularInline):
+    model = CommentLike
 
 
-# class CommentDislikeInline(admin.TabularInline):
-#     model = CommentDislike
+class CommentDislikeInline(admin.TabularInline):
+    model = CommentDislike
 
 
-# @admin.register(Comment)
-# class CommentAdmin(admin.ModelAdmin):
-#     inlines = [CommentLikeInline, CommentDislikeInline]
+@admin.register(Comment)
+class CommentAdmin(admin.ModelAdmin):
+    inlines = [CommentLikeInline, CommentDislikeInline]
 

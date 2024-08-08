@@ -12,6 +12,7 @@ django-filter = "*"
 djangorestframework-simplejwt = "*"
 psycopg2-binary = "*"
 django = "*"
+setuptools = "*"
 
 [dev-packages]
 

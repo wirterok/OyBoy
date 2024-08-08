@@ -11,3 +11,6 @@ router.register(r"dislike", views.DislikeViewSet)
 router.register(r"view", views.ViewViewSet)
 router.register(r"tag", views.TagViewSet)
 router.register(r"suggestion", views.SearchHistoryViewSet)
+# router.register(r"like-comment", views.CommentLikeViewSet)
+# router.register(r"dislike-comment", views.CommentDislikeViewSet)
+

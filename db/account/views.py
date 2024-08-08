@@ -12,7 +12,7 @@ from db.video.serializers import ViewSerializer, ChannelReportSerializer
 from db.video.models import ChannelReport
 from db.video.models import View
 from db.account.models import Profile, Subscription
-from db.account.serializers import ProfileSerializer, SubscriptionSerializer
+from db.account.serializers import ProfileSerializer, SubscriptionSerializer, RegistrationSerializer
 from utils.base import Utils
 # Create your views here.
 
@@ -42,11 +42,17 @@ class InitialView(APIView):
 
 class ProfileViewSet(mixins.RetrieveModelMixin,
                    mixins.UpdateModelMixin,
+                   mixins.ListModelMixin,
+                   mixins.CreateModelMixin,
                    GenericViewSet):
     
     model_class = Profile
-    serializer_class = ProfileSerializer
     queryset = model_class.objects
+
+    def get_serializer_class(self):
+        if self.action == 'create':
+            return RegistrationSerializer
+        return ProfileSerializer
 
     def get_queryset(self):
         return super().get_queryset() \
@@ -59,6 +65,13 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
                         .annotate(count=Count("id")).values("count")),
                 subscribed=Count("subscribers", filter=Q(subscribers__subscriber=self.request.user))
             )
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(serializer.errors)
+        serializer.save()
+        return Response(serializer.data)
 
     @action(detail=True, methods=["post"])
     def report(self, request, pk):
@@ -77,3 +90,4 @@ class ProfileViewSet(mixins.RetrieveModelMixin,
             return Response(qs.delete())
         instance = Subscription.objects.create(**creds)
         return Response(SubscriptionSerializer(instance).data)
+    

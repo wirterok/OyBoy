@@ -1,0 +1,17 @@
+version: '3.1'  # Визначення версії формату Docker Compose
+
+services:
+  db:  # Визначення сервісу з ім'ям 'db'
+    image: postgres  # Використання офіційного образу PostgreSQL з Docker Hub
+    restart: always  # Завжди перезапускати контейнер, якщо він зупиниться
+    environment:  # Налаштування змінних середовища для контейнера PostgreSQL
+      POSTGRES_USER: oyboy  # Ім'я користувача для бази даних PostgreSQL
+      POSTGRES_PASSWORD: DW1515Asd!324DW  # Пароль для користувача бази даних
+      POSTGRES_DB: oyboy  # Ім'я бази даних, яка буде створена
+    ports:
+      - "5432:5432"  # Відображення порту 5432 контейнера на порт 5432 хоста
+    volumes:
+      - postgres_data:/var/lib/postgresql/data  # Використання тому для збереження даних бази даних
+
+volumes:
+  postgres_data:  # Оголошення тому з ім'ям 'postgres_data'

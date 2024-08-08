@@ -53,6 +53,10 @@ class Like(BaseModel):
 
     def __str__(self) -> str:
         return self.profile.username + "|" + self.video.name
+    
+    class Meta:
+        unique_together = ("profile", "video")
+
 
 
 class Dislike(BaseModel):
@@ -104,10 +108,7 @@ class Comment(BaseModel, MPTTModel):
 
 class CommentLike(BaseModel):
     profile = ForeignKey("account.Profile", on_delete=models.SET_NULL, null=True)
-    comment = ForeignKey(Comment, on_delete=models.CASCADE, related_name="likes")
-
-    def __str__(self) -> str:
-        return self.profile.username + "|" + self.comment.name
+    comment = ForeignKey(Comment, on_delete=models.CASCADE, related_name="comlikes")
 
     class Meta:
         unique_together = ("profile", "comment")
@@ -115,10 +116,7 @@ class CommentLike(BaseModel):
 
 class CommentDislike(BaseModel):
     profile = ForeignKey("account.Profile", on_delete=models.SET_NULL, null=True)
-    comment = ForeignKey(Comment, on_delete=models.CASCADE, related_name="dislikes")
-
-    def __str__(self) -> str:
-        return self.profile.username + "|" + self.comment.name
+    comment = ForeignKey(Comment, on_delete=models.CASCADE, related_name="comdislikes")
 
     class Meta:
         unique_together = ("profile", "comment")
