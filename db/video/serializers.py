@@ -2,7 +2,7 @@ from rest_framework import serializers
 
 from db.account.serializers import ProfileSerializer
 
-from .models import Tag, VideoReport, ChannelReport, View, Like, Dislike, Favourite, Video, Tag, Comment, SearchHistory
+from .models import Tag, VideoReport, ChannelReport, View, Like, Dislike, Favourite, Video, Tag, Comment, SearchHistory, CommentLike, CommentDislike
 
 
 class ChannelReportSerializer(serializers.ModelSerializer):
@@ -127,12 +127,14 @@ class CommentSerializer(serializers.ModelSerializer):
     dislikes = serializers.SerializerMethodField(read_only=True)
     
     profile_id = serializers.IntegerField(write_only=True)
-    video_id = serializers.IntegerField(write_only=True)
-    parent_id = serializers.IntegerField(write_only=True, required=False)
+    video_id = serializers.IntegerField()
+    # parent_id = serializers.IntegerField(write_only=True, required=False)
 
     class Meta:
         model = Comment
-        exclude = ["video", "parent"]
+        # exclude = ["video"]
+        fields = ["name", "description", "likes", "dislikes", "parent",
+                  "video_id", "video", "profile", "profile_id"]
 
     def get_likes(self, obj):
         if likes := getattr(obj, "like_count", None):
@@ -143,3 +145,18 @@ class CommentSerializer(serializers.ModelSerializer):
         if dislikes := getattr(obj, "dislike_count", None):
             return dislikes
         return 0
+
+class CommentLikeSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = CommentLike
+        fields = ["profile", "comment_id"]
+
+
+class CommentDislikeSerializer(serializers.ModelSerializer):
+    profile = ProfileSerializer(read_only=True)
+
+    class Meta:
+        model = CommentDislike
+        fields = ["profile", "comment_id"]

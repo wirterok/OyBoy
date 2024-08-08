@@ -7,6 +7,7 @@ from rest_framework.decorators import action
 from rest_framework.response import Response
 from utils.base import Utils
 from django.db.models import Count, Q, OuterRef, Subquery
+from django.shortcuts import get_object_or_404
 
 from . import models
 from . import serializers
@@ -124,10 +125,21 @@ class CommentViewSet(ModelViewSet):
 
     def get_queryset(self):
         annotations = {
-            "like_count": Count('likes'),
-            "dislike_count": Count("dislikes")
+            "like_count": Count('comlikes'),
+            "dislike_count": Count("comdislikes")
         }
         return super().get_queryset().annotate(**annotations)
+    
+    @action(detail=True, methods=["post"])
+    def like(self, request, pk):
+        comment = get_object_or_404(models.Comment, pk=pk)
+        return Utils.toggle_view(comment, "comment", request.user, model=models.CommentLike, serializer=serializers.CommentLikeSerializer)
+
+
+    @action(detail=True, methods=["post"])
+    def dislike(self, request, pk):
+        comment = get_object_or_404(models.Comment, pk=pk)
+        return Utils.toggle_view(comment, "comment", request.user, model=models.CommentDislike, serializer=serializers.CommentDislikeSerializer)
 
 
 class FavouriteViewSet(ModelViewSet):
@@ -152,3 +164,14 @@ class ViewViewSet(ModelViewSet):
     model_class = models.View
     serializer_class = serializers.ViewSerializer
     queryset = model_class.objects.all()
+
+# class CommentLikeViewSet(ModelViewSet):
+#     model_class = models.CommentLike
+#     serializer_class = serializers.CommentLikeSerializer
+#     queryset = model_class.objects.all()
+
+
+# class CommentDislikeViewSet(ModelViewSet):
+#     model_class = models.CommentDislike
+#     serializer_class = serializers.CommentDislikeSerializer
+#     queryset = model_class.objects.all()

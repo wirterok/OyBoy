@@ -8,10 +8,14 @@ class ProfileSerializer(serializers.ModelSerializer):
     subscriber_count = serializers.SerializerMethodField(read_only=True, required=False)
     subscribtion_count = serializers.SerializerMethodField(read_only=True, required=False)
     subscribed = serializers.SerializerMethodField(read_only=True)
-    
+    # user_permissions = serializers.ListField(write_only=True)
+
     class Meta:
         model = Profile
+        # exclude = ["user_permissions"]
         fields = "__all__"
+        extra_kwargs = {'user_permissions': {'write_only': True}}
+
     
     def get_subscriber_count(self, obj):
         if subs := getattr(obj, "subscriber_count", None):
@@ -37,4 +41,21 @@ class SubscriptionSerializer(serializers.ModelSerializer):
         model = Subscription
         fields = ["profile", "subscriber"]
 
+    
+class RegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = Profile
+        fields = ['username', 'email', 'password', 'is_active']
+
+    def create(self, validated_data):
+        user = Profile(
+            username = validated_data['username'],
+            email = validated_data['email'],
+            is_active = validated_data['is_active'],
+        )
+        user.set_password(validated_data['password'])
+        user.save()
+        return user
     
